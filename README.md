@@ -1,12 +1,12 @@
 # ElectroMart India: Distributed E-Commerce Recommendation Data Platform
 
-[![Course](https://img.shields.io/badge/Course-Distributed_Database_Systems_(CF013)-blue.svg)]()
+[![Course](https://img.shields.io/badge/Course-Distributed_Database_Systems_-blue.svg)]()
 [![Degree](https://img.shields.io/badge/Degree-M.Tech_CSE_(2026--2027)-purple.svg)]()
 [![Cluster](https://img.shields.io/badge/Cluster-3--Node_MongoDB_Replica_Set_(rs0)-green.svg)]()
 [![Coordination](https://img.shields.io/badge/Coordination-Apache_ZooKeeper-amber.svg)]()
 [![Analytics](https://img.shields.io/badge/Analytics-Apache_Spark_Collaborative_Filtering-red.svg)]()
 
-A containerized distributed database micro-project designed and implemented for **Distributed Database Systems (Course Code: CF013)**. The platform demonstrates **tunable consistency paradigms (BASE vs. ACID)**, **empirical query optimization (IXSCAN vs. COLLSCAN)**, and a **hybrid recommendation pipeline** over a multi-category catalog of 32 products and 5,980 customer interaction records.
+A containerized distributed database micro-project designed and implemented for **Distributed Database Systems**. The platform demonstrates **tunable consistency paradigms (BASE vs. ACID)**, **empirical query optimization (IXSCAN vs. COLLSCAN)**, and a **hybrid recommendation pipeline** over a multi-category catalog of 32 products and 5,980 customer interaction records.
 
 ---
 

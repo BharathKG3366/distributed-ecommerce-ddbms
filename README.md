@@ -1,6 +1,6 @@
 # ElectroMart India: Distributed E-Commerce Recommendation Data Platform
 
-[![Course](https://img.shields.io/badge/Course-Distributed_Database_Systems_(CF013)-blue.svg)]()
+[![Course](https://img.shields.io/badge/Course-Distributed_Database_Systems_-blue.svg)]()
 [![Degree](https://img.shields.io/badge/Degree-M.Tech_CSE_(2026--2027)-purple.svg)]()
 [![Architecture](https://img.shields.io/badge/Cluster-3--Node_MongoDB_Replica_Set_(rs0)-green.svg)]()
 [![Coordination](https://img.shields.io/badge/Coordination-Apache_ZooKeeper-amber.svg)]()

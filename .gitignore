@@ -1,0 +1,19 @@
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Operating System & IDE artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local database volumes & logs
+*.log
+mongo1_data/
+mongo2_data/
+mongo3_data/

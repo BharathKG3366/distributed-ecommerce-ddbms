@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ElectroMart India | Online Shopping for Mobiles, Fashion, Electronics &amp; More</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen pb-24 transition-colors duration-200">
+
+  <!-- Production Distributed Cluster & Telemetry Bar -->
+  <div class="bg-slate-900 text-slate-100 border-b border-slate-800 sticky top-0 z-40 px-4 lg:px-8 py-2 shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-2 text-[11px]">
+        <span class="px-2.5 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          MongoDB Cluster: rs0 (3 Nodes Active)
+        </span>
+        <span class="px-2.5 py-0.5 rounded-full font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 hidden sm:inline">
+          ZooKeeper Coordinator: 2181
+        </span>
+        <span class="px-2.5 py-0.5 rounded-full font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30 hidden md:inline">
+          Spark Collaborative Engine: Online
+        </span>
+      </div>
+
+      <!-- Architecture & Theme Controls -->
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <div class="flex items-center gap-1 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800">
+          <span class="text-slate-400 font-medium text-[11px]">Consistency:</span>
+          <button id="btnBase" onclick="setConsistency('BASE')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-600 text-white">BASE (Secondary)</button>
+          <button id="btnAcid" onclick="setConsistency('ACID')" class="px-2 py-0.5 rounded text-[11px] font-bold text-slate-400 hover:text-white">ACID (Primary)</button>
+        </div>
+
+        <div class="flex items-center gap-1 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800">
+          <span class="text-slate-400 font-medium text-[11px]">Index Optimizer:</span>
+          <button id="btnIdxOn" onclick="setIndex(true)" class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-600 text-white">IXSCAN (Indexed)</button>
+          <button id="btnIdxOff" onclick="setIndex(false)" class="px-2 py-0.5 rounded text-[11px] font-bold text-slate-400 hover:text-white">COLLSCAN (Unindexed)</button>
+        </div>
+
+        <button onclick="toggleTelemetryPanel()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700">
+          📊 Cluster Metrics
+        </button>
+
+        <button onclick="toggleTheme()" id="themeBtn" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 hover:bg-amber-400/30 transition">
+          ☀️ Light / 🌙 Dark
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main E-Commerce Storefront Header -->
+  <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="resetCatalogFilters()">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center font-extrabold text-xl text-white shadow-md">
+          E
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">ElectroMart</h1>
+            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-400/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">Plus India</span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Mobiles • Fashion • Electronics • Home</p>
+        </div>
+      </div>
+
+      <!-- Global Search Bar -->
+      <div class="flex-1 max-w-lg">
+        <div class="relative">
+          <input
+            id="searchInput"
+            oninput="loadCatalog()"
+            type="text"
+            placeholder="Search for iPhone 16, Saree, MacBook, Air Fryer, Sony, Dyson..."
+            class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 focus:border-indigo-500 rounded-xl pl-4 pr-10 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none transition"
+          />
+          <button onclick="loadCatalog()" class="absolute right-3 top-2.5 text-slate-400 hover:text-indigo-500 text-sm font-bold">🔍</button>
+        </div>
+      </div>
+
+      <!-- Customer Account Switcher, Affinity Reset & Shopping Cart -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <div class="bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-1.5 flex items-center gap-2">
+          <span class="text-xs text-slate-500 dark:text-slate-400">Account:</span>
+          <select id="userSelect" onchange="switchUser()" class="bg-transparent text-xs font-bold text-indigo-600 dark:text-indigo-400 outline-none cursor-pointer">
+            <option value="ananya_sharma" class="bg-white dark:bg-slate-900">Ananya Sharma (Bengaluru)</option>
+            <option value="rohan_verma" class="bg-white dark:bg-slate-900">Rohan Verma (Mumbai)</option>
+            <option value="vikram_nair" class="bg-white dark:bg-slate-900">Vikram Nair (Hyderabad)</option>
+          </select>
+        </div>
+
+        <!-- Interactive Affinity Reset Buttons -->
+        <button onclick="resetAffinity('ZERO')" title="Clear all user interest scores to 0" class="px-3 py-2 rounded-xl text-xs font-bold bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/25 transition">
+          Reset Interests (0 pts)
+        </button>
+        <button onclick="resetAffinity('DEFAULT')" title="Restore default customer preferences" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition">
+          Restore Profile
+        </button>
+
+        <!-- Slide-Out Cart Button -->
+        <button onclick="toggleCartDrawer(true)" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-md transition">
+          <span>🛒 Cart</span>
+          <span id="cartCount" class="px-2 py-0.5 rounded-full bg-white text-indigo-700 font-extrabold text-[11px]">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 8-Category Navigation Bar -->
+    <div class="max-w-7xl mx-auto px-4 lg:px-8 pb-3 flex items-center gap-2 overflow-x-auto" id="categoryBar">
+      <button onclick="selectCategory('All')" data-cat="All" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm">All Categories (32)</button>
+      <button onclick="selectCategory('Mobiles')" data-cat="Mobiles" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200">📱 Mobiles</button>
+      <button onclick="selectCategory('Laptops')" data-cat="Laptops" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200">💻 Laptops</button>
+      <button onclick="selectCategory('Audio')" data-cat="Audio" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200">🎧 Audio</button>
+      <button onclick="selectCategory('Fashion')" data-cat="Fashion" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200">👗 Fashion &amp; Ethnic</button>
+      <button onclick="selectCategory('Home & Kitchen')" data-cat="Home & Kitchen" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200">🍳 Home &amp; Kitchen</button>
+      <button onclick="selectCategory('Wearables')" data-cat="Wearables" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200">⌚ Smart Wearables</button>
+      <button onclick="selectCategory('Accessories')" data-cat="Accessories" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200">⌨️ Gaming &amp; Accessories</button>
+      <button onclick="selectCategory('Beauty & Care')" data-cat="Beauty & Care" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200">✨ Beauty &amp; Care</button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-8">
+
+    <!-- Real-Time Distributed Database Telemetry Console -->
+    <section id="telemetrySection" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-lg">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Real-Time Distributed Database Telemetry</span>
+          <h2 class="text-lg font-extrabold text-slate-900 dark:text-white mt-0.5">Query Execution Profiler &amp; Replica Routing Monitor</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <div id="writeToast" class="text-xs mono bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-emerald-700 dark:text-emerald-400 px-3.5 py-1.5 rounded-xl">
+            Connected to Replica Set rs0 • Persistent Storage Active
+          </div>
+          <button onclick="clearTelemetryHistory()" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200">
+            Clear Logs
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+            <div class="text-xs text-slate-500 dark:text-slate-400">Optimizer Winning Plan</div>
+            <div id="metricStage" class="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 mono mt-1.5">IXSCAN</div>
+            <div class="text-[11px] text-slate-400 mt-1">explain("executionStats")</div>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+            <div class="text-xs text-slate-500 dark:text-slate-400">Interaction Docs Scanned</div>
+            <div id="metricDocs" class="text-2xl font-extrabold text-slate-900 dark:text-white mono mt-1">25</div>
+            <div class="text-[11px] text-slate-400 mt-1">Total collection: ~6,000 docs</div>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+            <div class="text-xs text-slate-500 dark:text-slate-400">Index Keys Examined</div>
+            <div id="metricKeys" class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 mono mt-1">25</div>
+            <div class="text-[11px] text-slate-400 mt-1">idx_user_category</div>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+            <div class="text-xs text-slate-500 dark:text-slate-400">Replica Node Routed</div>
+            <div id="metricNode" class="text-xs font-bold text-amber-600 dark:text-amber-300 mono mt-2">Secondary (27022/23)</div>
+            <div class="text-[11px] text-slate-400 mt-1">ReadPreference Routing</div>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+            <div class="text-xs text-slate-500 dark:text-slate-400">Roundtrip Query Latency</div>
+            <div id="metricLatency" class="text-xl font-extrabold text-emerald-600 dark:text-emerald-300 mono mt-1">-- ms</div>
+            <div class="text-[11px] text-slate-400 mt-1">API + MongoDB Engine</div>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
+            <div class="text-xs text-slate-500 dark:text-slate-400">Spark Co-Purchase Rule</div>
+            <div id="metricSpark" class="text-xs font-bold text-purple-600 dark:text-purple-300 mono mt-2">Fashion -&gt; Beauty</div>
+            <div class="text-[11px] text-slate-400 mt-1">Cross-Category Association</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+          <div class="text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Documents Scanned: IXSCAN vs COLLSCAN</div>
+          <canvas id="perfChart" height="135"></canvas>
+        </div>
+      </div>
+
+      <!-- Persistent MongoDB Telemetry Log Table -->
+      <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <div class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2">Stored Query Execution History (`telemetry_logs` in MongoDB):</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs mono">
+            <thead>
+              <tr class="text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                <th class="pb-1.5">Time</th>
+                <th class="pb-1.5">Customer</th>
+                <th class="pb-1.5">Consistency</th>
+                <th class="pb-1.5">Execution Plan</th>
+                <th class="pb-1.5">Docs Scanned</th>
+                <th class="pb-1.5">Routed Node</th>
+                <th class="pb-1.5">Latency</th>
+              </tr>
+            </thead>
+            <tbody id="telemetryHistoryBody" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Personalized Recommendations Section -->
+    <section class="bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-pink-500/5 border border-indigo-500/20 rounded-3xl p-6">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-5">
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-indigo-600 text-white">
+              Personalized For You
+            </span>
+            <span id="affinityBadges" class="text-xs font-semibold text-slate-600 dark:text-slate-300 mono"></span>
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1.5">Recommended Based on Your Activity</h2>
+        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Powered by Real-Time MongoDB Aggregation &amp; Spark Collaborative Filtering</p>
+      </div>
+
+      <div id="recContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+    </section>
+
+    <!-- Storefront Multi-Filter Bar + Full Product Catalog -->
+    <section>
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Product Catalog</span>
+          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Showing <span id="catalogCount">32</span> Products</h2>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5 text-xs">
+          <!-- Price Filter -->
+          <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-800">
+            <span class="text-slate-500 font-semibold">Price:</span>
+            <select id="priceFilter" onchange="loadCatalog()" class="bg-transparent font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer">
+              <option value="ALL" class="bg-white dark:bg-slate-900">All Prices</option>
+              <option value="UNDER_5K" class="bg-white dark:bg-slate-900">Under ₹5,000</option>
+              <option value="5K_25K" class="bg-white dark:bg-slate-900">₹5,000 – ₹25,000</option>
+              <option value="25K_75K" class="bg-white dark:bg-slate-900">₹25,000 – ₹75,000</option>
+              <option value="ABOVE_75K" class="bg-white dark:bg-slate-900">Above ₹75,000</option>
+            </select>
+          </div>
+
+          <!-- Discount Filter -->
+          <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-800">
+            <span class="text-slate-500 font-semibold">Discount:</span>
+            <select id="discountFilter" onchange="loadCatalog()" class="bg-transparent font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer">
+              <option value="0" class="bg-white dark:bg-slate-900">Any Discount</option>
+              <option value="15" class="bg-white dark:bg-slate-900">15% Off or more</option>
+              <option value="25" class="bg-white dark:bg-slate-900">25% Off or more</option>
+              <option value="40" class="bg-white dark:bg-slate-900">40% Off or more</option>
+            </select>
+          </div>
+
+          <!-- Customer Rating Filter -->
+          <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-800">
+            <span class="text-slate-500 font-semibold">Rating:</span>
+            <select id="ratingFilter" onchange="loadCatalog()" class="bg-transparent font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer">
+              <option value="0" class="bg-white dark:bg-slate-900">All Ratings</option>
+              <option value="4.7" class="bg-white dark:bg-slate-900">4.7★ &amp; above</option>
+              <option value="4.8" class="bg-white dark:bg-slate-900">4.8★ &amp; above</option>
+              <option value="4.9" class="bg-white dark:bg-slate-900">4.9★ Top Rated</option>
+            </select>
+          </div>
+
+          <!-- Sort By -->
+          <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-800">
+            <span class="text-slate-500 font-semibold">Sort:</span>
+            <select id="sortFilter" onchange="loadCatalog()" class="bg-transparent font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer">
+              <option value="rating" class="bg-white dark:bg-slate-900">Customer Rating</option>
+              <option value="reviews" class="bg-white dark:bg-slate-900">Most Reviewed</option>
+              <option value="price_asc" class="bg-white dark:bg-slate-900">Price: Low to High</option>
+              <option value="price_desc" class="bg-white dark:bg-slate-900">Price: High to Low</option>
+              <option value="discount" class="bg-white dark:bg-slate-900">Highest Discount %</option>
+            </select>
+          </div>
+
+          <button onclick="resetCatalogFilters()" class="px-3 py-2 rounded-xl font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 transition">
+            Reset Filters
+          </button>
+        </div>
+      </div>
+
+      <div id="catalogContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Slide-Out Shopping Cart Drawer -->
+  <div id="cartDrawerBackdrop" onclick="toggleCartDrawer(false)" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden"></div>
+  <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between shadow-2xl">
+    <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+      <div>
+        <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Your Shopping Cart</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Synced with MongoDB Replica Cluster</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="emptyCart()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-500/25 transition">
+          Empty Cart
+        </button>
+        <button onclick="toggleCartDrawer(false)" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold">✕</button>
+      </div>
+    </div>
+
+    <div id="cartItemsList" class="p-6 flex-1 overflow-y-auto space-y-4"></div>
+
+    <div class="p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 space-y-3">
+      <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+        <span>Total MRP</span>
+        <span id="cartMrp" class="mono font-semibold">₹0</span>
+      </div>
+      <div class="flex justify-between text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+        <span>Instant Discount Savings</span>
+        <span id="cartSavings" class="mono">- ₹0</span>
+      </div>
+      <div class="flex justify-between text-base font-extrabold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-800">
+        <span>Order Total</span>
+        <span id="cartTotalPayable" class="mono text-indigo-600 dark:text-indigo-400">₹0</span>
+      </div>
+      <button onclick="checkoutOrder()" class="w-full py-3 rounded-xl font-bold text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 transition">
+        Place Order Now
+      </button>
+    </div>
+  </aside>
+
+  <script>
+    let consistencyMode = localStorage.getItem('ddbms_consistency') || 'BASE';
+    let indexedMode = localStorage.getItem('ddbms_indexed') !== 'false';
+    let currentCategory = 'All';
+    let cartQtyMap = {};
+    let chartInstance = null;
+
+    // Default to Light Mode unless user chose Dark Mode
+    if (localStorage.getItem('ddbms_theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      if (htmlEl.classList.contains('dark')) {
+        htmlEl.classList.remove('dark');
+        localStorage.setItem('ddbms_theme', 'light');
+      } else {
+        htmlEl.classList.add('dark');
+        localStorage.setItem('ddbms_theme', 'dark');
+      }
+    }
+
+    function toggleTelemetryPanel() {
+      const panel = document.getElementById('telemetrySection');
+      panel.classList.toggle('hidden');
+    }
+
+    function formatINR(val) {
+      return '₹' + Number(val || 0).toLocaleString('en-IN');
+    }
+
+    function toggleCartDrawer(open) {
+      const drawer = document.getElementById('cartDrawer');
+      const backdrop = document.getElementById('cartDrawerBackdrop');
+      if (open) {
+        backdrop.classList.remove('hidden');
+        drawer.classList.remove('translate-x-full');
+        loadCart();
+      } else {
+        backdrop.classList.add('hidden');
+        drawer.classList.add('translate-x-full');
+      }
+    }
+
+    function setConsistency(mode) {
+      consistencyMode = mode;
+      localStorage.setItem('ddbms_consistency', mode);
+      document.getElementById('btnBase').className = mode === 'BASE'
+        ? 'px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-600 text-white'
+        : 'px-2 py-0.5 rounded text-[11px] font-bold text-slate-400 hover:text-white';
+      document.getElementById('btnAcid').className = mode === 'ACID'
+        ? 'px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-600 text-white'
+        : 'px-2 py-0.5 rounded text-[11px] font-bold text-slate-400 hover:text-white';
+      loadRecommendations();
+    }
+
+    function setIndex(state) {
+      indexedMode = state;
+      localStorage.setItem('ddbms_indexed', state);
+      document.getElementById('btnIdxOn').className = state
+        ? 'px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-600 text-white'
+        : 'px-2 py-0.5 rounded text-[11px] font-bold text-slate-400 hover:text-white';
+      document.getElementById('btnIdxOff').className = !state
+        ? 'px-2 py-0.5 rounded text-[11px] font-bold bg-rose-600 text-white'
+        : 'px-2 py-0.5 rounded text-[11px] font-bold text-slate-400 hover:text-white';
+      loadRecommendations();
+    }
+
+    function switchUser() {
+      localStorage.setItem('ddbms_user', document.getElementById('userSelect').value);
+      loadCart().then(() => {
+        loadRecommendations();
+        loadCatalog();
+      });
+    }
+
+    async function resetAffinity(mode) {
+      const userId = document.getElementById('userSelect').value;
+      await fetch(`/api/affinity/reset/${userId}?mode=${mode}`, { method: 'POST' });
+      document.getElementById('writeToast').innerHTML =
+        mode === 'ZERO'
+          ? `Activity scores reset to 0 pts for <span class="font-bold">${userId}</span>. Click any product to build new recommendations!`
+          : `Default shopping profile restored for <span class="font-bold">${userId}</span>.`;
+      loadRecommendations();
+    }
+
+    async function clearTelemetryHistory() {
+      await fetch('/api/telemetry/clear', { method: 'DELETE' });
+      loadRecommendations();
+    }
+
+    async function recordAction(productId, category, action) {
+      const userId = document.getElementById('userSelect').value;
+      const res = await fetch('/api/interact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          product_id: productId,
+          category: category,
+          action: action,
+          consistency_mode: consistencyMode
+        })
+      });
+      const data = await res.json();
+      document.getElementById('writeToast').innerHTML =
+        `Recorded <span class="font-bold">${action.toUpperCase()}</span> (${category}) • Write Latency: <span class="font-bold text-amber-600 dark:text-amber-300">${data.write_latency_ms} ms</span>`;
+      await loadCart();
+      loadRecommendations();
+      loadCatalog();
+    }
+
+    async function loadCart() {
+      const userId = document.getElementById('userSelect').value;
+      const res = await fetch(`/api/cart/${userId}`);
+      const data = await res.json();
+
+      cartQtyMap = data.qty_map || {};
+      document.getElementById('cartCount').textContent = data.total_items;
+      document.getElementById('cartMrp').textContent = formatINR(data.total_mrp);
+      document.getElementById('cartSavings').textContent = '- ' + formatINR(data.total_savings);
+      document.getElementById('cartTotalPayable').textContent = formatINR(data.total_price);
+
+      const listEl = document.getElementById('cartItemsList');
+      if (!data.items.length) {
+        listEl.innerHTML = `<div class="text-center py-12 text-slate-400 text-sm">Your cart is empty. Add items from the store!</div>`;
+        return;
+      }
+
+      listEl.innerHTML = data.items.map(item => `
+        <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-xl object-cover" />
+          <div class="flex-1 min-w-0">
+            <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">${item.category}</div>
+            <h4 class="text-xs font-bold text-slate-900 dark:text-white truncate">${item.name}</h4>
+            <div class="text-xs font-extrabold text-slate-800 dark:text-slate-200 mt-1">${formatINR(item.price)} × ${item.quantity} = ${formatINR(item.subtotal)}</div>
+            <div class="flex items-center gap-2 mt-2">
+              <button onclick="changeCartQty('${item.product_id}', -1)" class="w-6 h-6 rounded bg-slate-200 dark:bg-slate-800 font-bold text-xs hover:bg-rose-500 hover:text-white transition">-</button>
+              <span class="text-xs font-bold mono px-1">${item.quantity}</span>
+              <button onclick="changeCartQty('${item.product_id}', 1)" class="w-6 h-6 rounded bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-500 transition">+</button>
+              <button onclick="changeCartQty('${item.product_id}', 0)" class="ml-auto text-[11px] text-rose-500 font-semibold hover:underline">Remove</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function changeCartQty(productId, delta) {
+      const userId = document.getElementById('userSelect').value;
+      await fetch('/api/cart/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, product_id: productId, delta: delta })
+      });
+      await loadCart();
+      loadRecommendations();
+      loadCatalog();
+    }
+
+    async function emptyCart() {
+      const userId = document.getElementById('userSelect').value;
+      await fetch(`/api/cart/clear/${userId}`, { method: 'DELETE' });
+      await loadCart();
+      loadRecommendations();
+      loadCatalog();
+    }
+
+    async function checkoutOrder() {
+      const total = document.getElementById('cartTotalPayable').textContent;
+      if (total === '₹0') {
+        alert('Your cart is empty!');
+        return;
+      }
+      await emptyCart();
+      toggleCartDrawer(false);
+      alert(`Order Confirmed (${total})! Transaction synced across MongoDB Replica Set.`);
+    }
+
+    function renderProductCard(p, isRec = false) {
+      const inCartQty = cartQtyMap[p.product_id] || 0;
+      const badgeHtml = p.spark_badge
+        ? `<span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-purple-600 text-white shadow">${p.spark_badge}</span>`
+        : isRec
+        ? `<span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-indigo-600 text-white shadow">Top Pick For You</span>`
+        : `<span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900/85 text-amber-300">${p.tag}</span>`;
+
+      const cartButtonHtml = inCartQty > 0
+        ? `<div class="flex-1 flex items-center justify-between bg-emerald-600 text-white rounded-xl px-2 py-1.5 text-xs font-bold shadow">
+             <button onclick="changeCartQty('${p.product_id}', -1)" class="w-6 h-6 rounded bg-emerald-700 hover:bg-emerald-800">-</button>
+             <span class="mono">${inCartQty} in Cart</span>
+             <button onclick="recordAction('${p.product_id}', '${p.category}', 'cart')" class="w-6 h-6 rounded bg-emerald-700 hover:bg-emerald-800">+</button>
+           </div>`
+        : `<button onclick="recordAction('${p.product_id}', '${p.category}', 'cart')" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition shadow">
+             Add to Cart (+5)
+           </button>`;
+
+      return `
+        <div class="bg-white dark:bg-slate-900 border ${isRec ? 'border-indigo-500 shadow-lg shadow-indigo-500/10' : 'border-slate-200 dark:border-slate-800'} rounded-2xl overflow-hidden flex flex-col justify-between transition duration-200 hover:-translate-y-1 shadow-sm">
+          <div>
+            <div class="relative h-48 bg-slate-100 dark:bg-slate-950 overflow-hidden">
+              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover" />
+              <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-950/85 text-indigo-300">${p.category}</span>
+              ${badgeHtml}
+            </div>
+            <div class="p-5">
+              <div class="flex items-center justify-between text-xs mb-1">
+                <span class="text-slate-500 dark:text-slate-400 font-semibold">${p.brand}</span>
+                <span class="text-amber-500 font-bold">★ ${p.rating} <span class="text-slate-400 font-normal">(${p.reviews.toLocaleString()})</span></span>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-sm leading-snug line-clamp-2">${p.name}</h3>
+              <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-lg font-extrabold text-slate-900 dark:text-white">${formatINR(p.price)}</span>
+                <span class="text-xs text-slate-400 line-through">${formatINR(p.mrp)}</span>
+                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">${p.discount_pct}% off</span>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-5 pt-1 flex items-center gap-2">
+            <button onclick="recordAction('${p.product_id}', '${p.category}', 'view')" class="py-2 px-2.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">
+              View (+1)
+            </button>
+            <button onclick="recordAction('${p.product_id}', '${p.category}', 'wishlist')" class="py-2 px-2.5 rounded-xl text-xs font-semibold bg-pink-500/10 hover:bg-pink-500/20 text-pink-600 dark:text-pink-300 transition">
+              ♥ (+3)
+            </button>
+            ${cartButtonHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function updateChart(docsScanned) {
+      const ctx = document.getElementById('perfChart').getContext('2d');
+      const indexedVal = indexedMode ? docsScanned : 25;
+      const unindexedVal = !indexedMode ? docsScanned : 6000;
+
+      if (chartInstance) {
+        chartInstance.data.datasets[0].data = [indexedVal, unindexedVal];
+        chartInstance.update();
+        return;
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['IXSCAN (Indexed)', 'COLLSCAN (Full Scan)'],
+          datasets: [{
+            label: 'Docs Examined',
+            data: [indexedVal, unindexedVal],
+            backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(244, 63, 94, 0.85)'],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { color: '#94a3b8', font: { size: 10 } } },
+            x: { ticks: { color: '#94a3b8', font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    async function loadRecommendations() {
+      const userId = document.getElementById('userSelect').value;
+      const res = await fetch(`/api/recommendations/${userId}?consistency_mode=${consistencyMode}&indexed=${indexedMode}`);
+      const data = await res.json();
+
+      document.getElementById('recContainer').innerHTML = data.recommendations.map(p => renderProductCard(p, true)).join('');
+
+      const t = data.telemetry;
+      const stageEl = document.getElementById('metricStage');
+      stageEl.textContent = t.scan_stage;
+      stageEl.className = t.scan_stage.includes('IXSCAN')
+        ? 'text-sm font-extrabold text-emerald-600 dark:text-emerald-400 mono mt-1.5'
+        : 'text-sm font-extrabold text-rose-600 dark:text-rose-400 mono mt-1.5';
+
+      document.getElementById('metricDocs').textContent = t.interaction_docs_examined.toLocaleString();
+      document.getElementById('metricKeys').textContent = t.interaction_keys_examined.toLocaleString();
+      document.getElementById('metricNode').textContent = t.routed_node;
+      document.getElementById('metricLatency').textContent = `${t.total_api_ms} ms (DB: ${t.mongo_exec_ms} ms)`;
+
+      if (data.spark_insight) {
+        document.getElementById('metricSpark').textContent =
+          `${data.spark_insight.base_category} -> ${data.spark_insight.paired_category} (${data.spark_insight.confidence_pct}%)`;
+      }
+
+      const affSummary = data.affinity.length
+        ? data.affinity.map(a => `${a._id}: ${a.score} pts`).join(' • ')
+        : '0 pts (Fresh Profile — Click any product below!)';
+      document.getElementById('affinityBadges').textContent = `Interest Profile: [ ${affSummary} ]`;
+
+      const historyBody = document.getElementById('telemetryHistoryBody');
+      historyBody.innerHTML = (data.telemetry_history || []).map(row => `
+        <tr class="text-slate-700 dark:text-slate-300">
+          <td class="py-1.5">${row.timestamp}</td>
+          <td class="py-1.5 font-semibold">${row.user_id}</td>
+          <td class="py-1.5">${row.consistency_model}</td>
+          <td class="py-1.5 ${row.scan_stage.includes('IXSCAN') ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-bold'}">${row.scan_stage}</td>
+          <td class="py-1.5">${row.interaction_docs_examined}</td>
+          <td class="py-1.5">${row.routed_node}</td>
+          <td class="py-1.5 font-bold">${row.total_api_ms} ms</td>
+        </tr>
+      `).join('');
+
+      updateChart(t.interaction_docs_examined);
+    }
+
+    function selectCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm';
+        } else {
+          btn.className = 'cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200';
+        }
+      });
+      loadCatalog();
+    }
+
+    function resetCatalogFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('priceFilter').value = 'ALL';
+      document.getElementById('discountFilter').value = '0';
+      document.getElementById('ratingFilter').value = '0';
+      document.getElementById('sortFilter').value = 'rating';
+      selectCategory('All');
+    }
+
+    async function loadCatalog() {
+      const search = document.getElementById('searchInput').value;
+      const priceRange = document.getElementById('priceFilter').value;
+      const minDiscount = document.getElementById('discountFilter').value;
+      const minRating = document.getElementById('ratingFilter').value;
+      const sortBy = document.getElementById('sortFilter').value;
+
+      const url = `/api/catalog?category=${encodeURIComponent(currentCategory)}&search=${encodeURIComponent(search)}&price_range=${priceRange}&min_rating=${minRating}&min_discount=${minDiscount}&sort_by=${sortBy}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      document.getElementById('catalogCount').textContent = data.count;
+      document.getElementById('catalogContainer').innerHTML = data.products.map(p => renderProductCard(p, false)).join('');
+    }
+
+    // Initialize saved session state
+    const savedUser = localStorage.getItem('ddbms_user');
+    if (savedUser) document.getElementById('userSelect').value = savedUser;
+    setConsistency(consistencyMode);
+    setIndex(indexedMode);
+    loadCart().then(() => {
+      loadRecommendations();
+      loadCatalog();
+    });
+  </script>
+</body>
+</html>
